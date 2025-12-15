@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.calculadoradeimc.domain.model.ActivityLevel
 import com.example.calculadoradeimc.domain.model.Gender
-import com.example.calculadoradeimc.domain.usecase.*
 import com.example.calculadoradeimc.presentation.components.InputField
 import com.example.calculadoradeimc.presentation.components.MetricCard
 import com.example.calculadoradeimc.presentation.viewmodel.HomeViewModel
@@ -32,13 +31,6 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
-    
-    // Use cases for interpretations
-    val calculateBMI = remember { CalculateBMIUseCase() }
-    val calculateBMR = remember { CalculateBMRUseCase() }
-    val calculateBodyFat = remember { CalculateBodyFatUseCase() }
-    val calculateIdealWeight = remember { CalculateIdealWeightUseCase() }
-    val calculateDailyCaloricNeeds = remember { CalculateDailyCaloricNeedsUseCase() }
     
     Scaffold(
         topBar = {
@@ -259,7 +251,7 @@ fun HomeScreen(
                 MetricCard(
                     title = "IMC (Índice de Massa Corporal)",
                     value = String.format("%.2f - %s", measurement.bmi, measurement.bmiClassification),
-                    interpretation = calculateBMI.getInterpretation(measurement.bmi),
+                    interpretation = viewModel.getBMIInterpretation(measurement.bmi),
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
                 
@@ -268,7 +260,7 @@ fun HomeScreen(
                     MetricCard(
                         title = "TMB (Taxa Metabólica Basal)",
                         value = String.format("%.0f calorias/dia", bmr),
-                        interpretation = calculateBMR.getInterpretation(bmr),
+                        interpretation = viewModel.getBMRInterpretation(bmr),
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
                 }
@@ -278,7 +270,7 @@ fun HomeScreen(
                     MetricCard(
                         title = "Peso Ideal",
                         value = String.format("%.1f kg", idealWeight),
-                        interpretation = calculateIdealWeight.getInterpretation(measurement.weight, idealWeight),
+                        interpretation = viewModel.getIdealWeightInterpretation(measurement.weight, idealWeight),
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
                 }
@@ -290,9 +282,9 @@ fun HomeScreen(
                         value = String.format(
                             "%.1f%% - %s",
                             measurement.bodyFatPercentage,
-                            calculateBodyFat.classify(measurement.bodyFatPercentage, measurement.gender)
+                            viewModel.getBodyFatClassification(measurement.bodyFatPercentage, measurement.gender)
                         ),
-                        interpretation = calculateBodyFat.getInterpretation(
+                        interpretation = viewModel.getBodyFatInterpretation(
                             measurement.bodyFatPercentage,
                             measurement.gender
                         ),
@@ -305,7 +297,7 @@ fun HomeScreen(
                     MetricCard(
                         title = "Necessidade Calórica Diária",
                         value = String.format("%.0f calorias/dia", calories),
-                        interpretation = calculateDailyCaloricNeeds.getInterpretation(calories),
+                        interpretation = viewModel.getDailyCaloricInterpretation(calories),
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
                 }

@@ -14,13 +14,15 @@ import kotlinx.coroutines.launch
  * ViewModel for the detail screen showing a specific measurement
  */
 class DetailViewModel(
-    private val repository: MeasurementRepository,
-    private val calculateBMI: CalculateBMIUseCase = CalculateBMIUseCase(),
-    private val calculateBMR: CalculateBMRUseCase = CalculateBMRUseCase(),
-    private val calculateBodyFat: CalculateBodyFatUseCase = CalculateBodyFatUseCase(),
-    private val calculateIdealWeight: CalculateIdealWeightUseCase = CalculateIdealWeightUseCase(),
-    private val calculateDailyCaloricNeeds: CalculateDailyCaloricNeedsUseCase = CalculateDailyCaloricNeedsUseCase()
+    private val repository: MeasurementRepository
 ) : ViewModel() {
+    
+    // Use cases - in a production app, these would be injected via DI
+    private val calculateBMI = CalculateBMIUseCase()
+    private val calculateBMR = CalculateBMRUseCase()
+    private val calculateBodyFat = CalculateBodyFatUseCase()
+    private val calculateIdealWeight = CalculateIdealWeightUseCase()
+    private val calculateDailyCaloricNeeds = CalculateDailyCaloricNeedsUseCase()
     
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()

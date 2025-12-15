@@ -18,14 +18,16 @@ import java.util.Date
  * ViewModel for the home screen where users input measurements
  */
 class HomeViewModel(
-    private val repository: MeasurementRepository,
-    private val calculateBMI: CalculateBMIUseCase = CalculateBMIUseCase(),
-    private val calculateBMR: CalculateBMRUseCase = CalculateBMRUseCase(),
-    private val calculateBodyFat: CalculateBodyFatUseCase = CalculateBodyFatUseCase(),
-    private val calculateIdealWeight: CalculateIdealWeightUseCase = CalculateIdealWeightUseCase(),
-    private val calculateDailyCaloricNeeds: CalculateDailyCaloricNeedsUseCase = CalculateDailyCaloricNeedsUseCase(),
-    private val validateInput: ValidateInputUseCase = ValidateInputUseCase()
+    private val repository: MeasurementRepository
 ) : ViewModel() {
+    
+    // Use cases - in a production app, these would be injected via DI
+    private val calculateBMI = CalculateBMIUseCase()
+    private val calculateBMR = CalculateBMRUseCase()
+    private val calculateBodyFat = CalculateBodyFatUseCase()
+    private val calculateIdealWeight = CalculateIdealWeightUseCase()
+    private val calculateDailyCaloricNeeds = CalculateDailyCaloricNeedsUseCase()
+    private val validateInput = ValidateInputUseCase()
     
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -170,6 +172,23 @@ class HomeViewModel(
     fun clearResults() {
         _uiState.value = HomeUiState()
     }
+    
+    // Expose interpretation methods for UI
+    fun getBMIInterpretation(bmi: Double): String = calculateBMI.getInterpretation(bmi)
+    
+    fun getBMRInterpretation(bmr: Double): String = calculateBMR.getInterpretation(bmr)
+    
+    fun getBodyFatInterpretation(bodyFat: Double, gender: Gender): String = 
+        calculateBodyFat.getInterpretation(bodyFat, gender)
+    
+    fun getBodyFatClassification(bodyFat: Double, gender: Gender): String = 
+        calculateBodyFat.classify(bodyFat, gender)
+    
+    fun getIdealWeightInterpretation(currentWeight: Double, idealWeight: Double): String = 
+        calculateIdealWeight.getInterpretation(currentWeight, idealWeight)
+    
+    fun getDailyCaloricInterpretation(dailyCalories: Double): String = 
+        calculateDailyCaloricNeeds.getInterpretation(dailyCalories)
 }
 
 data class HomeUiState(

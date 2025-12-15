@@ -18,13 +18,14 @@ class MainActivity : ComponentActivity() {
         // Initialize database and repository
         val database = AppDatabase.getDatabase(applicationContext)
         val repository = MeasurementRepositoryImpl(database.measurementDao())
+        val viewModelFactory = com.example.calculadoradeimc.presentation.viewmodel.ViewModelFactory(repository)
         
         setContent {
             CalculadoraDeIMCTheme {
                 val navController = rememberNavController()
                 NavGraph(
                     navController = navController,
-                    repository = repository
+                    viewModelFactory = viewModelFactory
                 )
             }
         }

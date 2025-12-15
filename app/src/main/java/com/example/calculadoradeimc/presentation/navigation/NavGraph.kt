@@ -1,18 +1,16 @@
 package com.example.calculadoradeimc.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.calculadoradeimc.data.repository.MeasurementRepository
 import com.example.calculadoradeimc.presentation.screen.DetailScreen
 import com.example.calculadoradeimc.presentation.screen.HistoryScreen
 import com.example.calculadoradeimc.presentation.screen.HomeScreen
-import com.example.calculadoradeimc.presentation.viewmodel.DetailViewModel
-import com.example.calculadoradeimc.presentation.viewmodel.HistoryViewModel
-import com.example.calculadoradeimc.presentation.viewmodel.HomeViewModel
+import com.example.calculadoradeimc.presentation.viewmodel.ViewModelFactory
 
 /**
  * Navigation graph for the application
@@ -20,16 +18,15 @@ import com.example.calculadoradeimc.presentation.viewmodel.HomeViewModel
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    repository: MeasurementRepository
+    viewModelFactory: ViewModelFactory
 ) {
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route
     ) {
         composable(Screen.Home.route) {
-            val viewModel = HomeViewModel(repository)
             HomeScreen(
-                viewModel = viewModel,
+                viewModel = viewModel(factory = viewModelFactory),
                 onNavigateToHistory = {
                     navController.navigate(Screen.History.route)
                 }
@@ -37,9 +34,8 @@ fun NavGraph(
         }
         
         composable(Screen.History.route) {
-            val viewModel = HistoryViewModel(repository)
             HistoryScreen(
-                viewModel = viewModel,
+                viewModel = viewModel(factory = viewModelFactory),
                 onNavigateBack = {
                     navController.popBackStack()
                 },
@@ -58,9 +54,8 @@ fun NavGraph(
             )
         ) { backStackEntry ->
             val measurementId = backStackEntry.arguments?.getLong("measurementId") ?: 0L
-            val viewModel = DetailViewModel(repository)
             DetailScreen(
-                viewModel = viewModel,
+                viewModel = viewModel(factory = viewModelFactory),
                 measurementId = measurementId,
                 onNavigateBack = {
                     navController.popBackStack()
