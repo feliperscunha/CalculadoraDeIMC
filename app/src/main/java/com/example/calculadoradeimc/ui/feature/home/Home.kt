@@ -74,7 +74,7 @@ fun Home(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
             )
             OutlinedTextField(
                 value = uiState.age,
@@ -83,7 +83,7 @@ fun Home(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
             )
             GenderSelector(
                 gender = uiState.gender,
