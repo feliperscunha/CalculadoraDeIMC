@@ -1,9 +1,10 @@
 package com.example.calculadoradeimc.domain.repository
 
-import com.example.calculadoradeimc.domain.imcData
+import com.example.calculadoradeimc.data.IMCEntity
+import kotlinx.coroutines.flow.Flow
 
 interface CalculationRepository {
-    fun getHistory(): List<imcData>
-    fun calculateImc(weight: String, height: String): imcData?
-    fun addImcToHistory(imc: imcData)
+    suspend fun insert(imcEntity: IMCEntity)
+    fun getAll(): Flow<List<IMCEntity>>
+    suspend fun getById(id: Int): IMCEntity?
 }

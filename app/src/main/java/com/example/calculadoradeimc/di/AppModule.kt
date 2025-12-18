@@ -1,20 +1,36 @@
 package com.example.calculadoradeimc.di
 
-import com.example.calculadoradeimc.data.repository.CalculationRepositoryImpl
-import com.example.calculadoradeimc.domain.repository.CalculationRepository
-import dagger.Binds
+import android.content.Context
+import androidx.room.Room
+import com.example.calculadoradeimc.data.IMCDatabase
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class AppModule {
+object AppModule {
 
-    @Binds
+    @Provides
     @Singleton
-    abstract fun bindCalculationRepository(
-        calculationRepositoryImpl: CalculationRepositoryImpl
-    ): CalculationRepository
+    fun provideIMCDatabase(@ApplicationContext context: Context): IMCDatabase {
+        return Room.databaseBuilder(
+            context,
+            IMCDatabase::class.java,
+            "imc_database"
+        ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideIMCDao(database: IMCDatabase) = database.imcDao()
+
+    @Provides
+    @Singleton
+    fun provideCalculationRepository(imcDao: com.example.calculadoradeimc.data.IMCDao): com.example.calculadoradeimc.domain.repository.CalculationRepository {
+        return com.example.calculadoradeimc.data.repository.CalculationRepositoryImpl(imcDao)
+    }
 }

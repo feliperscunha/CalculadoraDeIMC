@@ -1,10 +1,10 @@
-package com.example.calculadoradeimc
+package com.example.calculadoradeimc.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.calculadoradeimc.ui.feature.Home
+import com.example.calculadoradeimc.navigation.IMCNavHost
 import com.example.calculadoradeimc.ui.theme.CalculadoraDeIMCTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CalculadoraDeIMCTheme()  {
-                Home()
+                IMCNavHost()
             }
         }
     }

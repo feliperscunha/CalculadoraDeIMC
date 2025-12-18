@@ -1,28 +1,18 @@
 package com.example.calculadoradeimc.ui.feature
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -31,8 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.calculadoradeimc.ui.components.HistoricalItem
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.calculadoradeimc.ui.theme.Blue
 import com.example.calculadoradeimc.ui.theme.CalculadoraDeIMCTheme
 import com.example.calculadoradeimc.ui.theme.White
@@ -41,10 +30,11 @@ import com.example.calculadoradeimc.viewmodel.HomeViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    onHistoryClick: () -> Unit
 ) {
 
-    val state = viewModel.uiState
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -67,135 +57,183 @@ fun Home(
                 .background(color = White)
                 .verticalScroll(rememberScrollState())
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            OutlinedTextField(
+                value = uiState.weight,
+                onValueChange = viewModel::onWeightChange,
+                label = { Text("Peso (kg)") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            OutlinedTextField(
+                value = uiState.height,
+                onValueChange = viewModel::onHeightChange,
+                label = { Text("Altura (cm)") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            OutlinedTextField(
+                value = uiState.age,
+                onValueChange = viewModel::onAgeChange,
+                label = { Text("Idade") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            GenderSelector(
+                gender = uiState.gender,
+                onGenderChange = viewModel::onGenderChange
+            )
+            ActivityLevelSelector(
+                activityLevel = uiState.activityLevel,
+                onActivityLevelChange = viewModel::onActivityLevelChange
+            )
+            Button(
+                onClick = viewModel::calculate,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
-                Text(
-                    text = "Altura (cm)",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(20.dp, 100.dp, 0.dp, 0.dp)
-                )
-
-                Text(
-                    text = "Peso (kg)",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(0.dp, 100.dp, 20.dp, 0.dp)
-                )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                OutlinedTextField(
-                    value = state.height,
-                    onValueChange = viewModel::onHeightChange,
-                    label = {
-                        Text(text = "Ex: 165")
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(0.4f)
-                        .padding(
-                            20.dp,
-                            0.dp,
-                            0.dp,
-                            0.dp
-                        ),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = White,
-                        focusedContainerColor = White,
-                        errorContainerColor = White,
-                        focusedLabelColor = Blue,
-                        focusedIndicatorColor = Blue,
-                        cursorColor = Blue,
-                    ),
-                    isError = state.textFieldError
-                )
-
-                OutlinedTextField(
-                    value = state.weight,
-                    onValueChange = viewModel::onWeightChange,
-                    label = {
-                        Text(text = "Ex: 70.50")
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(0.7f)
-                        .padding(
-                            0.dp,
-                            0.dp,
-                            20.dp,
-                            0.dp
-                        ),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Decimal
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = White,
-                        focusedContainerColor = White,
-                        errorContainerColor = White,
-                        focusedLabelColor = Blue,
-                        focusedIndicatorColor = Blue,
-                        cursorColor = Blue,
-                    ),
-                    isError = state.textFieldError
-                )
+                Text(text = "Calcular")
             }
 
             Button(
-                onClick = viewModel::onCalculate,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Blue
-                ),
+                onClick = onHistoryClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
-                    .padding(50.dp)
+                    .padding(16.dp)
             ) {
-                Text(
-                    text = "CALCULAR",
-                    fontSize = 18.sp,
-                    color = White,
-                    fontWeight = FontWeight.Bold,
-                )
+                Text(text = "Ver Histórico")
             }
 
-            Text(
-                text = state.resultMessage,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Blue,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-            )
-
-            if (state.history.isNotEmpty()) {
+            if (uiState.imc > 0) {
                 Text(
-                    text = "Histórico",
-                    fontSize = 20.sp,
+                    text = "IMC: %.2f".format(uiState.imc),
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Blue,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 24.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
+                        .padding(10.dp)
                 )
-                LazyColumn(
+                Text(
+                    text = "Classificação: ${uiState.imcClassification}",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Blue,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp) // Adjust height as needed
-                ) {
-                    items(state.history) { imc ->
-                        HistoricalItem(imc = imc)
-                    }
+                        .padding(10.dp)
+                )
+                Text(
+                    text = "TMB: %.2f".format(uiState.bmr),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Blue,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                )
+                Text(
+                    text = "Peso Ideal: ${uiState.idealWeight}",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Blue,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                )
+                Text(
+                    text = "Necessidade Calórica Diária: ${uiState.dailyCaloricNeed}",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Blue,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun GenderSelector(
+    gender: Int,
+    onGenderChange: (Int) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = gender == 0,
+            onClick = { onGenderChange(0) }
+        )
+        Text(text = "Masculino")
+        Spacer(modifier = Modifier.width(16.dp))
+        RadioButton(
+            selected = gender == 1,
+            onClick = { onGenderChange(1) }
+        )
+        Text(text = "Feminino")
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ActivityLevelSelector(
+    activityLevel: Int,
+    onActivityLevelChange: (Int) -> Unit
+) {
+    val activityLevels = listOf("Sedentário", "Leve", "Moderado", "Intenso")
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            OutlinedTextField(
+                value = activityLevels[activityLevel],
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Nível de Atividade Física") },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                activityLevels.forEachIndexed { index, text ->
+                    DropdownMenuItem(
+                        onClick = {
+                            onActivityLevelChange(index)
+                            expanded = false
+                        },
+                        text = { Text(text = text) }
+                    )
                 }
             }
         }
@@ -205,7 +243,7 @@ fun Home(
 @Preview
 @Composable
 private fun HomePreview() {
-    CalculadoraDeIMCTheme() {
-        Home(viewModel = HomeViewModel(repository = com.example.calculadoradeimc.data.repository.CalculationRepositoryImpl()))
+    CalculadoraDeIMCTheme {
+        Home(onHistoryClick = {})
     }
 }
