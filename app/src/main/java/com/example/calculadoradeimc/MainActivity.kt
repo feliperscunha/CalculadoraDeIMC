@@ -1,4 +1,4 @@
-package com.example.calculadoradeimc.ui
+package com.example.calculadoradeimc
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            CalculadoraDeIMCTheme()  {
+            CalculadoraDeIMCTheme() {
                 IMCNavHost()
             }
         }

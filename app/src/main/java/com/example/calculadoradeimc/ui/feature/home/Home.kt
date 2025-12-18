@@ -25,7 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.calculadoradeimc.ui.theme.Blue
 import com.example.calculadoradeimc.ui.theme.CalculadoraDeIMCTheme
 import com.example.calculadoradeimc.ui.theme.White
-import com.example.calculadoradeimc.viewmodel.HomeViewModel
+import com.example.calculadoradeimc.ui.feature.home.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

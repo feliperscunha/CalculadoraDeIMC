@@ -1,13 +1,15 @@
-package com.example.calculadoradeimc.viewmodel
+package com.example.calculadoradeimc.ui.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.calculadoradeimc.data.IMCEntity
+import com.example.calculadoradeimc.datasource.Calculations
 import com.example.calculadoradeimc.domain.repository.CalculationRepository
-import com.example.calculadoradeimc.ui.feature.home.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -61,11 +63,11 @@ class HomeViewModel @Inject constructor(
 
             if (weight != null && height != null && age != null) {
                 _errorMessage.value = null
-                val imc = com.example.calculadoradeimc.datasource.Calculations.calculateIMC(weight, height)
-                val imcClassification = com.example.calculadoradeimc.datasource.Calculations.getIMCClassification(imc)
-                val tmb = com.example.calculadoradeimc.datasource.Calculations.calculateTMB(weight, height, age, _uiState.value.gender)
-                val idealWeight = com.example.calculadoradeimc.datasource.Calculations.calculateIdealWeight(height, _uiState.value.gender)
-                val dailyCaloric = com.example.calculadoradeimc.datasource.Calculations.calculateDailyCaloric(tmb, _uiState.value.activityLevel)
+                val imc = Calculations.calculateIMC(weight, height)
+                val imcClassification = Calculations.getIMCClassification(imc)
+                val tmb = Calculations.calculateTMB(weight, height, age, _uiState.value.gender)
+                val idealWeight = Calculations.calculateIdealWeight(height, _uiState.value.gender)
+                val dailyCaloric = Calculations.calculateDailyCaloric(tmb, _uiState.value.activityLevel)
 
                 _uiState.value = _uiState.value.copy(
                     imc = imc,
@@ -76,12 +78,12 @@ class HomeViewModel @Inject constructor(
                 )
 
                 repository.insert(
-                    com.example.calculadoradeimc.data.IMCEntity(
+                    IMCEntity(
                         weight = weight,
                         height = height,
                         imc = imc,
                         classification = imcClassification,
-                        date = java.util.Date(),
+                        date = Date(),
                         tmb = tmb,
                         idealWeight = idealWeight,
                         dailyCaloric = dailyCaloric
