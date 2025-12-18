@@ -29,7 +29,7 @@ import java.util.Date
 @Composable
 fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel(),
-    onItemClick: (Int) -> Unit,
+    onItemClick: (Long) -> Unit,
     onBack: () -> Unit
 ) {
     val history by viewModel.history.collectAsState()

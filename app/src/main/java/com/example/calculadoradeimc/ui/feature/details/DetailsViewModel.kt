@@ -18,7 +18,7 @@ class DetailsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<IMCEntity?>(null)
     val uiState: StateFlow<IMCEntity?> = _uiState
 
-    fun getIMC(id: Int) {
+    fun getIMC(id: Long) {
         viewModelScope.launch {
             _uiState.value = repository.getById(id)
         }

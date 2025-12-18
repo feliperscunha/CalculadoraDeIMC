@@ -6,7 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.calculadoradeimc.ui.feature.Home
+import com.example.calculadoradeimc.ui.feature.home.Home
 import com.example.calculadoradeimc.ui.feature.details.DetailsScreen
 import com.example.calculadoradeimc.ui.feature.historic.HistoryScreen
 
@@ -33,10 +33,10 @@ fun IMCNavHost() {
         }
         composable(
             route = "details/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.IntType })
+            arguments = listOf(navArgument("id") { type = NavType.LongType })
         ) { backStackEntry ->
             DetailsScreen(
-                id = backStackEntry.arguments?.getInt("id") ?: 0,
+                id = backStackEntry.arguments?.getLong("id") ?: 0L,
                 onBack = {
                     navController.popBackStack()
                 }

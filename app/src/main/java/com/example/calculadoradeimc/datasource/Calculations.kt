@@ -19,10 +19,10 @@ object Calculations {
         }
     }
 
-    fun calculateBMR(weight: Double, height: Double, age: Int, gender: Int): Double {
-        return if (gender == 0) { // Male
+    fun calculateTMB(weight: Double, height: Double, age: Int, gender: Int): Double {
+        return if (gender == 0) {
             88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
-        } else { // Female
+        } else {
             447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age)
         }
     }
@@ -30,19 +30,19 @@ object Calculations {
     fun calculateIdealWeight(height: Double, gender: Int): String {
         val idealWeight = if (gender == 0) { // Male
             50 + 0.91 * (height - 152.4)
-        } else { // Female
+        } else {
             45.5 + 0.91 * (height - 152.4)
         }
         return String.format("%.2f", idealWeight)
     }
 
-    fun calculateDailyCaloricNeed(bmr: Double, activityLevel: Int): String {
-        val caloricNeed = when (activityLevel) {
-            0 -> bmr * 1.2 // Sedentary
-            1 -> bmr * 1.375 // Light
-            2 -> bmr * 1.55 // Moderate
-            else -> bmr * 1.725 // Intense
+    fun calculateDailyCaloric(tmb: Double, activityLevel: Int): String {
+        val caloric = when (activityLevel) {
+            0 -> tmb * 1.2
+            1 -> tmb * 1.375
+            2 -> tmb * 1.55
+            else -> tmb * 1.725
         }
-        return String.format("%.2f", caloricNeed)
+        return String.format("%.2f", caloric)
     }
 }

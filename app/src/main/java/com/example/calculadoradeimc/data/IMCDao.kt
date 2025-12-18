@@ -14,5 +14,5 @@ interface IMCDao {
     fun getAll(): Flow<List<IMCEntity>>
 
     @Query("SELECT * FROM imc_table WHERE id = :id")
-    suspend fun getById(id: Int): IMCEntity?
+    suspend fun getById(id: Long): IMCEntity?
 }

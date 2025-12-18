@@ -17,7 +17,7 @@ class CalculationRepositoryImpl @Inject constructor(
         return imcDao.getAll()
     }
 
-    override suspend fun getById(id: Int): IMCEntity? {
+    override suspend fun getById(id: Long): IMCEntity? {
         return imcDao.getById(id)
     }
 }

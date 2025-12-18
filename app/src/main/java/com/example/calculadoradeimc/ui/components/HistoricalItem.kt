@@ -69,9 +69,9 @@ private fun HistoricalItemPreview() {
             imc = 22.86,
             classification = "Peso normal",
             date = Date(),
-            bmr = 1600.0,
+            tmb = 1600.0,
             idealWeight = "70.0",
-            dailyCaloricNeed = "2000"
+            dailyCaloric = "2000"
         ),
         onClick = {}
     )

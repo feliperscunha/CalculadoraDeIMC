@@ -21,7 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @Composable
 fun DetailsScreen(
     viewModel: DetailsViewModel = hiltViewModel(),
-    id: Int,
+    id: Long,
     onBack: () -> Unit
 ) {
     val imc by viewModel.uiState.collectAsState()
@@ -54,9 +54,9 @@ fun DetailsScreen(
                 Text(text = "IMC: ${it.imc}")
                 Text(text = "Classificação: ${it.classification}")
                 Text(text = "Data: ${it.date}")
-                Text(text = "TMB: ${it.bmr}")
+                Text(text = "TMB: ${it.tmb}")
                 Text(text = "Peso Ideal: ${it.idealWeight}")
-                Text(text = "Necessidade Calórica Diária: ${it.dailyCaloricNeed}")
+                Text(text = "Necessidade Calórica Diária: ${it.dailyCaloric}")
             }
         }
     }

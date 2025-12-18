@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface CalculationRepository {
     suspend fun insert(imcEntity: IMCEntity)
     fun getAll(): Flow<List<IMCEntity>>
-    suspend fun getById(id: Int): IMCEntity?
+    suspend fun getById(id: Long): IMCEntity?
 }

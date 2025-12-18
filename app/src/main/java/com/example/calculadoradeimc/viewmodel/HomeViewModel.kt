@@ -3,7 +3,7 @@ package com.example.calculadoradeimc.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.calculadoradeimc.domain.repository.CalculationRepository
-import com.example.calculadoradeimc.ui.feature.HomeUiState
+import com.example.calculadoradeimc.ui.feature.home.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -63,16 +63,16 @@ class HomeViewModel @Inject constructor(
                 _errorMessage.value = null
                 val imc = com.example.calculadoradeimc.datasource.Calculations.calculateIMC(weight, height)
                 val imcClassification = com.example.calculadoradeimc.datasource.Calculations.getIMCClassification(imc)
-                val bmr = com.example.calculadoradeimc.datasource.Calculations.calculateBMR(weight, height, age, _uiState.value.gender)
+                val tmb = com.example.calculadoradeimc.datasource.Calculations.calculateTMB(weight, height, age, _uiState.value.gender)
                 val idealWeight = com.example.calculadoradeimc.datasource.Calculations.calculateIdealWeight(height, _uiState.value.gender)
-                val dailyCaloricNeed = com.example.calculadoradeimc.datasource.Calculations.calculateDailyCaloricNeed(bmr, _uiState.value.activityLevel)
+                val dailyCaloric = com.example.calculadoradeimc.datasource.Calculations.calculateDailyCaloric(tmb, _uiState.value.activityLevel)
 
                 _uiState.value = _uiState.value.copy(
                     imc = imc,
                     imcClassification = imcClassification,
-                    bmr = bmr,
+                    tmb = tmb,
                     idealWeight = idealWeight,
-                    dailyCaloricNeed = dailyCaloricNeed
+                    dailyCaloric = dailyCaloric
                 )
 
                 repository.insert(
@@ -82,9 +82,9 @@ class HomeViewModel @Inject constructor(
                         imc = imc,
                         classification = imcClassification,
                         date = java.util.Date(),
-                        bmr = bmr,
+                        tmb = tmb,
                         idealWeight = idealWeight,
-                        dailyCaloricNeed = dailyCaloricNeed
+                        dailyCaloric = dailyCaloric
                     )
                 )
             }

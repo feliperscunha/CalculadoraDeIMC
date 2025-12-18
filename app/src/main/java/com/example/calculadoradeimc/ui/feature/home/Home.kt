@@ -1,4 +1,4 @@
-package com.example.calculadoradeimc.ui.feature
+package com.example.calculadoradeimc.ui.feature.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -143,7 +143,7 @@ fun Home(
                         .padding(10.dp)
                 )
                 Text(
-                    text = "TMB: %.2f".format(uiState.bmr),
+                    text = "TMB: %.2f".format(uiState.tmb),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Blue,
@@ -163,7 +163,7 @@ fun Home(
                         .padding(10.dp)
                 )
                 Text(
-                    text = "Necessidade Calórica Diária: ${uiState.dailyCaloricNeed}",
+                    text = "Necessidade Calórica Diária: ${uiState.dailyCaloric}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Blue,
