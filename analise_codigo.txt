@@ -1,0 +1,110 @@
+# Análise do Projeto: Calculadora de IMC
+
+Este documento detalha a arquitetura, o fluxo de dados e as implementações técnicas do aplicativo "Calculadora de IMC". O projeto segue as melhores práticas de desenvolvimento Android, utilizando Kotlin, Jetpack Compose para a UI, e uma arquitetura MVVM (Model-View-ViewModel).
+
+---
+
+## 1. Fórmulas Utilizadas
+
+A lógica de cálculo está centralizada no arquivo `datasource/Calculations.kt`. As seguintes métricas são calculadas:
+
+#### a. Índice de Massa Corporal (IMC)
+A fórmula padrão para calcular o IMC é:
+```kotlin
+peso / (altura / 100)^2
+```
+- **`peso`**: Em quilogramas (kg).
+- **`altura`**: Em centímetros (cm), convertida para metros para o cálculo.
+
+#### b. Classificação do IMC
+O resultado do IMC é classificado em categorias (ex: "Abaixo do peso", "Normal", "Sobrepeso"), que estão implementadas diretamente na lógica do `HomeViewModel` ou em uma função de utilidade.
+
+#### c. Taxa Metabólica Basal (TMB)
+O aplicativo usa a fórmula de **Mifflin-St Jeor**, uma das mais precisas para estimar o gasto calórico em repouso.
+
+- **Para homens:**
+  ```kotlin
+  (10 * peso) + (6.25 * altura) - (5 * idade) + 5
+  ```
+- **Para mulheres:**
+  ```kotlin
+  (10 * peso) + (6.25 * altura) - (5 * idade) - 161
+  ```
+
+#### d. Peso Ideal
+É calculado usando a **Fórmula de Robinson (1983)**.
+
+- **Para homens:**
+  ```kotlin
+  52 + (1.9 * ((altura / 2.54) - 60))
+  ```
+- **Para mulheres:**
+  ```kotlin
+  49 + (1.7 * ((altura / 2.54) - 60))
+  ```
+_Nota: A fórmula opera com a altura em polegadas, por isso a conversão `altura / 2.54`._
+
+#### e. Calorias Diárias para Manter o Peso
+As calorias diárias são estimadas multiplicando a TMB por um fator de nível de atividade física. O fator exato (ex: 1.2 para sedentário, 1.55 para moderadamente ativo) é selecionado pelo usuário na interface.
+
+---
+
+## 2. Modelo de Dados
+
+O modelo de dados é definido pela classe `IMCEntity.kt`, que representa a tabela no banco de dados local. Cada instância dessa classe é um registro completo de um cálculo realizado.
+
+**Estrutura da `IMCEntity`:**
+- `id`: `Int` (Chave primária autogerada)
+- `weight`: `Double` (Peso do usuário)
+- `height`: `Int` (Altura do usuário)
+- `imc`: `Double` (Resultado do IMC)
+- `classification`: `String` (Classificação do IMC, ex: "Normal")
+- `tmb`: `Double` (Taxa Metabólica Basal)
+- `idealWeight`: `String` (Intervalo de peso ideal)
+- `dailyCaloric`: `String` (Intervalo de calorias diárias)
+- `date`: `Date` (Data em que o cálculo foi salvo)
+
+---
+
+## 3. Implementação da Persistência de Dados
+
+O aplicativo salva o histórico de cálculos do usuário em um banco de dados SQLite local, gerenciado pela biblioteca **Room**.
+
+#### a. Room Database (`IMCDatabase.kt`)
+- Define a classe do banco de dados que herda de `RoomDatabase`.
+- Lista as entidades (`IMCEntity`) que compõem o banco.
+- Anexa os `TypeConverters` necessários, como o que converte um objeto `Date` em um `Long` (timestamp) para ser armazenado no banco de dados, e vice-versa.
+- A implementação atual usa `fallbackToDestructiveMigration()`, o que significa que, ao atualizar a versão do banco de dados, os dados antigos são apagados.
+
+#### b. DAO (Data Access Object) (`IMCDao.kt`)
+- É uma interface que define todos os métodos de acesso ao banco de dados.
+- Utiliza `suspend` para funções de escrita (`insert`), garantindo que elas sejam executadas em uma corrotina (fora da thread principal).
+- Utiliza `Flow<List<IMCEntity>>` para a função de leitura (`getAll`), permitindo que a UI observe as mudanças no banco de dados de forma reativa e se atualize automaticamente.
+
+#### c. Repository Pattern (`CalculationRepository.kt` e `CalculationRepositoryImpl.kt`)
+- O `CalculationRepository` atua como uma camada de abstração entre os ViewModels e a fonte de dados (o DAO).
+- A implementação `CalculationRepositoryImpl` recebe o DAO via injeção de dependência e expõe métodos para inserir e obter os cálculos.
+- Este padrão desacopla a lógica de negócio das fontes de dados, facilitando testes e futuras alterações (como adicionar uma fonte de dados remota).
+
+#### d. Injeção de Dependência com Hilt (`AppModule.kt`)
+- O Hilt gerencia o ciclo de vida e o fornecimento de todas as dependências.
+- O `AppModule` instrui o Hilt sobre como criar instâncias do `IMCDatabase`, `IMCDao` e `CalculationRepository`.
+- Ao anotar as classes como `@Singleton`, o Hilt garante que apenas uma instância de cada um desses componentes exista durante todo o ciclo de vida do aplicativo, otimizando recursos.
+
+---
+
+## 4. Melhorias para Versões Futuras
+
+O aplicativo tem uma base sólida que permite diversas expansões:
+
+1.  **Gráficos de Progresso:** Utilizar os dados históricos salvos para plotar gráficos da evolução do peso e do IMC ao longo do tempo, usando bibliotecas como `MPAndroidChart` ou o próprio Canvas do Compose.
+
+2.  **Autenticação de Usuários:** Integrar um serviço como o **Firebase Authentication** para permitir que os usuários criem contas. Isso possibilita salvar dados na nuvem (Firestore) e sincronizá-los entre diferentes dispositivos.
+
+3.  **Integração com APIs de Saúde:** Conectar-se com o **Health Connect** (a API unificada do Google para dados de saúde) ou diretamente com o Google Fit para ler dados de peso e altura, e também para registrar novos dados de medição feitos no app. Isso requer a solicitação de permissões do usuário.
+
+4.  **Definição de Metas:** Permitir que os usuários definam metas de peso (ganhar ou perder) e mostrar o progresso em direção a essas metas, oferecendo feedback e encorajamento.
+
+5.  **Estratégia de Migração de Banco de Dados:** Substituir `fallbackToDestructiveMigration()` por um plano de migração robusto no Room. Isso é crucial para evitar que os usuários percam seu histórico de dados quando o aplicativo for atualizado com uma nova versão do banco de dados.
+
+6.  **Internacionalização (i18n) e Localização (l10n):** Mover todos os textos fixos (hardcoded) do código-fonte para arquivos de recursos (`strings.xml`) para facilitar a tradução do aplicativo para outros idiomas.
