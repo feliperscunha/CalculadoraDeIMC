@@ -1,33 +1,48 @@
 package com.example.calculadoradeimc.datasource
 
-import android.annotation.SuppressLint
+import kotlin.math.pow
 
 object Calculations {
-    @SuppressLint("DefaultLocale")
-    fun calculateIMC(height: String, weight: String, response: (String, Boolean) -> Unit){
-        if(height.isNotEmpty() && weight.isNotEmpty()){
 
-            val weightFormatted = weight.replace(",", ".").toDoubleOrNull()
-            val heightFormatted = height.toDoubleOrNull()
+    fun calculateIMC(weight: Double, height: Double): Double {
+        return weight / (height / 100).pow(2)
+    }
 
-            if(weightFormatted != null && heightFormatted != null){
-
-                val imc = weightFormatted / ((heightFormatted/100) * (heightFormatted/100))
-                val imcFormatted = String.format("%.2f", imc)
-
-                when {
-
-                    imc < 18.5 -> response("IMC: $imcFormatted\nAbaixo do Peso", false)
-                    imc in 18.5..24.9 -> response("IMC: $imcFormatted\nPeso Normal", false)
-                    imc in 25.0..29.9 -> response("IMC: $imcFormatted\nSobrepeso", false)
-                    imc in 30.0..34.9 -> response("IMC: $imcFormatted\nObesidade (Grau 1)", false)
-                    imc in 35.0..39.9 -> response("IMC: $imcFormatted\nObesidade Severa (Grau 2)", false)
-                    else -> response("IMC: $imcFormatted\nObesidade Mórbida (Grau 3)", false)
-                }
-            }
-        } else {
-
-            response("Preencha todos os campos!", true)
+    fun getIMCClassification(imc: Double): String {
+        return when {
+            imc < 18.5 -> "Abaixo do peso"
+            imc < 24.9 -> "Peso normal"
+            imc < 29.9 -> "Sobrepeso"
+            imc < 34.9 -> "Obesidade Grau I"
+            imc < 39.9 -> "Obesidade Grau II"
+            else -> "Obesidade Grau III"
         }
+    }
+
+    fun calculateTMB(weight: Double, height: Double, age: Int, gender: Int): Double {
+        return if (gender == 0) {
+            88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
+        } else {
+            447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age)
+        }
+    }
+
+    fun calculateIdealWeight(height: Double, gender: Int): String {
+        val idealWeight = if (gender == 0) { // Male
+            50 + 0.91 * (height - 152.4)
+        } else {
+            45.5 + 0.91 * (height - 152.4)
+        }
+        return String.format("%.2f", idealWeight)
+    }
+
+    fun calculateDailyCaloric(tmb: Double, activityLevel: Int): String {
+        val caloric = when (activityLevel) {
+            0 -> tmb * 1.2
+            1 -> tmb * 1.375
+            2 -> tmb * 1.55
+            else -> tmb * 1.725
+        }
+        return String.format("%.2f", caloric)
     }
 }
