@@ -25,6 +25,9 @@ fun IMCNavHost() {
             HistoryScreen(
                 onItemClick = { id ->
                     navController.navigate("details/$id")
+                },
+                onBack = {
+                    navController.popBackStack()
                 }
             )
         }

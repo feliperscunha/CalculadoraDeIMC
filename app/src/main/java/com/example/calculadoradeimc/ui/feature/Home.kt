@@ -35,6 +35,7 @@ fun Home(
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     Scaffold(
         topBar = {
@@ -92,6 +93,16 @@ fun Home(
                 activityLevel = uiState.activityLevel,
                 onActivityLevelChange = viewModel::onActivityLevelChange
             )
+            errorMessage?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                )
+            }
             Button(
                 onClick = viewModel::calculate,
                 modifier = Modifier

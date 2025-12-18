@@ -18,16 +18,22 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState
 
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
+
     fun onWeightChange(weight: String) {
         _uiState.value = _uiState.value.copy(weight = weight)
+        _errorMessage.value = null
     }
 
     fun onHeightChange(height: String) {
         _uiState.value = _uiState.value.copy(height = height)
+        _errorMessage.value = null
     }
 
     fun onAgeChange(age: String) {
         _uiState.value = _uiState.value.copy(age = age)
+        _errorMessage.value = null
     }
 
     fun onGenderChange(gender: Int) {
@@ -40,11 +46,21 @@ class HomeViewModel @Inject constructor(
 
     fun calculate() {
         viewModelScope.launch {
-            val weight = _uiState.value.weight.toDoubleOrNull()
-            val height = _uiState.value.height.toDoubleOrNull()
-            val age = _uiState.value.age.toIntOrNull()
+            val weightStr = _uiState.value.weight
+            val heightStr = _uiState.value.height
+            val ageStr = _uiState.value.age
+
+            if (weightStr.isBlank() || heightStr.isBlank() || ageStr.isBlank()) {
+                _errorMessage.value = "Todos os campos devem ser preenchidos"
+                return@launch
+            }
+
+            val weight = weightStr.toDoubleOrNull()
+            val height = heightStr.toDoubleOrNull()
+            val age = ageStr.toIntOrNull()
 
             if (weight != null && height != null && age != null) {
+                _errorMessage.value = null
                 val imc = com.example.calculadoradeimc.datasource.Calculations.calculateIMC(weight, height)
                 val imcClassification = com.example.calculadoradeimc.datasource.Calculations.getIMCClassification(imc)
                 val bmr = com.example.calculadoradeimc.datasource.Calculations.calculateBMR(weight, height, age, _uiState.value.gender)
