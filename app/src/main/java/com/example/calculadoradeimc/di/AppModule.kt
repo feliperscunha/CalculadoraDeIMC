@@ -21,7 +21,7 @@ object AppModule {
             context,
             IMCDatabase::class.java,
             "imc_database"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
